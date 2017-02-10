@@ -4,43 +4,57 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <cmath>
 
 using namespace std;
 
 WordAnalysis::WordAnalysis(int size) {
     words = new word[size];
     index = 0;
-    wordCount = 0;
+    wordCount = size;
     timesDoubled = 0;
 }
 
 WordAnalysis::~WordAnalysis() {}
 
 void WordAnalysis::sortData() {
+    //int length = 100*(pow(2, timesDoubled));
+    word hold;
+    int v;
 
-}
+    for(int i = 0; i < index; i++) {
+        v = i;
+        while(v > 0 && words[v].count > words[v-1].count) {
+            hold = words[v];
+            words[v] = words[v-1];
+            words[v-1] = hold;
+            v--;
+        }//end while
+    }//end for
+}//end insertion sort
 
 void WordAnalysis::doubleArrayAndAdd(string c) {
 
-    int length = 100*(pow(2, timesDoubled));
+    //int length = 100*(pow(2, timesDoubled));
 
-    if (index == length-1) { //NO space left in array
-      //double array
-      word *newArray = new word[length*2];
+    if (index == wordCount-1) { //NO space left in array
+        //double array
+        word *newArray = new word[wordCount*2];
 
-      for(int i = 0; i < length; i++) {
-      newArray[i].w = words[i].w;
-      newArray[i].count = words[i].count;
-      }
+        for (int i = 0; i < index; i++) {
+            newArray[i].w = words[i].w;
+            newArray[i].count = words[i].count;
+        }
 
-      delete [] words;
-      words = newArray;
+        delete [] words;
+        words = newArray;
 
-      timesDoubled++;
+        wordCount = wordCount*2;
+        timesDoubled++;
     }
-    words[index].w = c;
-    words[index].count += 1;
+    word newWord;
+    newWord.w = c;
+    newWord.count = 1;
+    words[index] = newWord;
     index++;
 
 }//end doubleArrayAndAdd
@@ -66,61 +80,16 @@ bool WordAnalysis::checkIfCommonWord(string word) {
     return true;
 }
 
-bool WordAnalysis::readDataFile(char* filename) {
-
-    ifstream booktxt;
-    int length;
-
-    booktxt.open(filename, ifstream::in); //open the file
-
-    if (booktxt.fail())
-    {
-        return false; // check if file opens successfully
-    }
-    else
-    {
-        string line;
-        int j = 0;
-
-        while (getline(booktxt, line))//run through all lines of data
-        {
-            stringstream ss(line);
-            string c;
-
-            while (getline(ss, c, ' ')) //check through each element (c) in the line
-            {
-                length = 100*(pow(2, timesDoubled));
-                if (checkIfCommonWord(c)) {
-                    wordCount++;
-                    int uniqIndex;
-
-                    for (int i = 0; i < length; i++) {
-                        if (c == words[i].w) {
-                            uniqIndex = i; //if word is in array, returns index
-                            break;
-                        }
-                        uniqIndex = -1; //otherwise, return invalid
-                    }//end for
-
-                    if (uniqIndex == -1) { // -1 : word is unique to array
-                        doubleArrayAndAdd(c);
-                    }
-                    else { // otherwise, the number is the index where the word is found in the array
-                        words[uniqIndex].count += 1;
-                    }
-                }//end if
-                else {
-                    continue;
-                }
-
-            }//end while
-
-        }//end data
-    }//end else
-
-}//end readDataFile
-
 void WordAnalysis::printCommonWords(int n) {
+
+
+  //int length = 100*(pow(2, timesDoubled));
+
+  for (int i = 0; i < n; i++) {
+      cout << words[i].count << " - " << words[i].w << endl;
+  }
+
+  /*
     int topCount = 0;
     int topIndex = 0;
     int length = 100*(pow(2, timesDoubled));
@@ -143,12 +112,65 @@ void WordAnalysis::printCommonWords(int n) {
         }//end inner for
         cout << words[topIndex].count << " - " << words[topIndex].w << endl;
         words[topIndex].count = 0; //delete values at biggest index so new loop finds next biggest
-    }
+    } */
 }
 
-int WordAnalysis::getWordCount() {
-    delete words;
+bool WordAnalysis::readDataFile(char* filename) {
+    int totalCount = 0;
+    ifstream booktxt;
+    //int length;
+    bool uniq;
 
+    booktxt.open(filename, ifstream::in); //open the file
+
+    if (booktxt.fail())
+    {
+        return false; // check if file opens successfully
+    }
+    else
+    {
+        string line;
+        int j = 0;
+
+        while (getline(booktxt, line))//run through all lines of data
+        {
+            stringstream ss(line);
+            string c;
+
+            while (getline(ss, c, ' ')) //check through each element (c) in the line
+            {
+                //length = 100*(pow(2, timesDoubled));
+                if (checkIfCommonWord(c)) { // return true means that it is NOT a common word
+                    totalCount++;
+                    uniq = true;
+
+                    for (int i = 0; i < index; i++) {
+                        if (c == words[i].w) {
+                            words[i].count = words[i].count + 1;
+                            uniq = false;
+                            break;
+                        }
+                    }//end for
+
+                    if (uniq) { //word is unique to array
+                        doubleArrayAndAdd(c);
+                    }
+                }//end if
+                else {
+                    continue;
+                }
+
+            }//end while
+
+        }//end data
+    }//end else
+    wordCount = totalCount;
+    sortData();
+    //delete [] words;
+
+}//end readDataFile
+
+int WordAnalysis::getWordCount() {
     return wordCount;
 }
 int WordAnalysis::getUniqueWordCount() {
