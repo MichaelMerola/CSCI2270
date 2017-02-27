@@ -10,7 +10,7 @@ using namespace std;
 string printMenu() {
     string input;
 
-    cout <<	"======Main Menu======"	<< endl;
+    cout <<	"======Main Menu====="	<< endl;
     cout <<	"1. Enqueue word" << endl;
     cout <<	"2. Dequeue word"	<< endl;
     cout <<	"3. Print queue" << endl;
@@ -26,12 +26,11 @@ string printMenu() {
 int main(int argc, char* argv[]) {
 
     //instantiate class object
-    Queue Q(8);
+    Queue Q(10);
 
     //relevant variables
     bool quit = false;
     string userInput;
-    char* filename = argv[1];
     string word;
     string sentence;
 

@@ -97,11 +97,16 @@ void Queue::printQueue() {
 
         }//end if */
 
-        for (int i = 0; i < qMaxSize; i++) {
+        for (int i = head; i < qMaxSize; i++) {
             if (qArray[i] != "") { //check if spot in array is empty
                 cout << i << ": " << qArray[i] << endl;
             }
         }//end for
+        for (int j = 0; j < head; j++) {
+            if (qArray[j] != "") { //check if spot in array is empty
+                cout << j << ": " << qArray[j] << endl;
+            }
+        }
 
     } else {
         cout << "Empty" << endl;
