@@ -1,29 +1,25 @@
-// DELETES ALL TARGETS IN AN ARRAY
+// DELETES ALL TARGET VALUES IN AN ARRAY
 
 node * DeleteNode(node *head, int target) {
     node *temp;
     temp = head;
 
+    node *left = head;
+    //if deleting single node, create a search flag
 
-    if (head->value == target) { //check if head is target
-        temp = head;
-        head = head->next;
-    }
-    else {
-        node *left = head;
-        temp = head->next;
-        //bool found = false; //search flag
-        while (temp != NULL) {
-            if (temp->value == target) {
-                left->next = temp->next;
-                temp = temp->next;
+    while (temp != NULL) {
+        if (temp->value == target) {
+            if (temp == head) {  //check if head is target
+                head = head->next;
             }
-            else {
-                left = temp;
-                temp = temp->next;
-            }
+            left->next = temp->next;
+            temp = temp->next;
         }
-    }//end else
+        else {
+            left = temp;
+            temp = temp->next;
+        }
+    }
 
     delete temp;
     return head;
