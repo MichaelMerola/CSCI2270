@@ -69,7 +69,7 @@ MovieNode* MovieTree::inorderPrint(MovieNode* temp) {
     if(temp->left != NULL)
         inorderPrint(temp->left);
 
-    cout << "Movie:" << temp->title << " " << temp->quantity << endl;
+    cout << "Movie: " << temp->title << " " << temp->quantity << endl;
 
     if(temp->right != NULL)
         inorderPrint(temp->right);
@@ -88,13 +88,13 @@ void MovieTree::countNodes(MovieNode* temp, int* c) {
 
 }
 
-MovieNode* MovieTree::treeMax(MovieNode* temp) {
+MovieNode* MovieTree::treeMin(MovieNode* temp) {
 
     if (temp == NULL)
         return NULL;
 
-    while (temp->right != NULL) {
-        temp = temp->right;
+    while (temp->left != NULL) {
+        temp = temp->left;
     }
     return temp; //returns max value of left subtree
 
@@ -136,7 +136,7 @@ void MovieTree::deleteMovieNode(string title) {
         }
         //One child
         else if(found->right == NULL) {
-            MovieNode *x = found->right;
+            MovieNode *x = found->left;
             if (found->parent->right == found){
                 found->parent->right = x;
             }
@@ -147,25 +147,37 @@ void MovieTree::deleteMovieNode(string title) {
             delete found;
         }
         else if(found->left == NULL) {
-            MovieNode *x = found->left;
-            if (found->parent->left = found){
-                found->parent->left = found->left;
+            MovieNode *x = found->right;
+            if (found->parent->left == found){
+                found->parent->left = x;
             }
             else {
-                found->parent->right = found->left;
+                found->parent->right = x;
             }
-            found->left->parent = found->parent;
+            x->parent = found->parent;
             delete found;
         }
         //Two child
         else {
-            MovieNode* max = treeMax(found->left);//
-            MovieNode* temp = found;
-            max->right = found->right;
-            max->left = found->left;
-            found = max;
-            delete temp;
-            max->parent->right = NULL;
+            MovieNode* min = treeMin(found->right);
+
+            // If minimum is the right child of toFind
+            if(min == found->right) {
+                found->parent->left = min;
+                min->parent = found->parent;
+                min->left = found->left;
+                min->left->parent = min;
+            }
+            else {
+                min->parent->left = min->right;
+                min->right->parent = min->parent;
+                min->parent = found->parent;
+                found->parent->left = min;
+                min->left = found->left;
+                min->right = found->right;
+                found->right->parent = min;
+                found->left->parent = min;
+            }
         }
 
     }//end outer if
@@ -192,6 +204,7 @@ void MovieTree::rentMovie(string title) {
         cout << "Movie not found." << endl;
     }
     else {
+        found->quantity = found->quantity - 1;
         cout << "Movie has been rented." << endl;
         cout << "Movie Info:" << endl;
         cout << "===========" << endl;
@@ -200,7 +213,6 @@ void MovieTree::rentMovie(string title) {
         cout << "Year:" << found->year << endl;
         cout << "Quantity:" << found->quantity << endl;
 
-        found->quantity = found->quantity - 1;
         if (found->quantity == 0) {
             deleteMovieNode(title);
         }

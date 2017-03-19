@@ -10,7 +10,7 @@ using namespace std;
 string printMenu() {
     string input;
 
-    cout <<	"======Main Menu====="	<< endl;
+    cout <<	"======Main Menu======"	<< endl;
     cout <<	"1. Find a movie" << endl;
     cout <<	"2. Rent a movie"	<< endl;
     cout <<	"3. Print the inventory" << endl;

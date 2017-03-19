@@ -54,7 +54,7 @@ class MovieTree
         void countNodes(MovieNode* temp, int* c);
         //MovieNode* search(std::string title);
         MovieNode* treeSearch(MovieNode* temp, std::string title);
-        MovieNode* treeMax(MovieNode* temp);
+        MovieNode* treeMin(MovieNode* temp);
         MovieNode* root;
 
         void addNode(MovieNode* newNode, MovieNode* temp);
