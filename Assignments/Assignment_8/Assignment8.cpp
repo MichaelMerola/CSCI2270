@@ -58,16 +58,20 @@ int main(int argc, char* argv[]) {
                 mt.findMovie(title);
                 break;
             case 2:
-
+                cout << "Enter title:" << endl;
+                getline(cin, title);
+                mt.rentMovie(title);
                 break;
             case 3:
-
+                mt.printMovieInventory();
                 break;
             case 4:
-
+                cout << "Enter title:" << endl;
+                getline(cin, title);
+                mt.deleteMovieNode(title);
                 break;
             case 5:
-
+                mt.countMovieNodes();
                 break;
             case 6:
                 quit = true;

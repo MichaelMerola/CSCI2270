@@ -38,7 +38,7 @@ class MovieTree
         MovieTree();
         ~MovieTree();
         void printMovieInventory();
-        int countMovieNodes();
+        void countMovieNodes();
         void deleteMovieNode(std::string title);
         void addMovieNode(int ranking, std::string title, int releaseYear, int quantity);
         void findMovie(std::string title);
@@ -49,15 +49,16 @@ class MovieTree
     protected:
 
     private:
-        void DeleteAll(MovieNode* node); //use this for the post-order traversal deletion of the tree
+        void DeleteAll(MovieNode* temp); //use this for the post-order traversal deletion of the tree
         void printMovieInventory(MovieNode* node);
-        void countMovieNodes(MovieNode* node, int* c);
+        void countNodes(MovieNode* temp, int* c);
         //MovieNode* search(std::string title);
         MovieNode* treeSearch(MovieNode* temp, std::string title);
-        MovieNode* treeMinimum(MovieNode* node);
+        MovieNode* treeMax(MovieNode* temp);
         MovieNode* root;
 
         void addNode(MovieNode* newNode, MovieNode* temp);
+        MovieNode* inorderPrint(MovieNode* temp);
 };
 
 #endif //MOVIETREE_H
