@@ -16,7 +16,7 @@ string printMenu() {
     cout <<	"3. Print the inventory" << endl;
     cout <<	"4. Delete a movie" << endl;
     cout <<	"5. Count the movies" << endl;
-    cout << "6. Count the longest path"
+    cout << "6. Count the longest path" << endl;
     cout <<	"7. Quit" << endl;
 
     getline(cin,input);
@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
                 mt.countMovieNodes();
                 break;
             case 6:
-                
+                cout << "Longest Path: " << mt.countLongestPath() << endl;
                 break;
             case 7:
                 quit = true;

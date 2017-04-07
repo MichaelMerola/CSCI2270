@@ -60,20 +60,18 @@ class MovieTree
         void countNodes(MovieNode* temp, int* c);
         MovieNode* treeSearch(MovieNode* temp, std::string title);
         MovieNode* treeMin(MovieNode* temp);
-        MovieNode* root;
 
         void addNode(MovieNode* newNode, MovieNode* temp);
         MovieNode* inorderPrint(MovieNode* temp);
 
         void rbAddFixup(MovieNode * node); //called after insert to fix tree
         void leftRotate(MovieNode * x); //rotate the tree left with x as the root of the rotation
-        void rbDelete(MovieNode * z); //delete a node. Call this from deleteMovieNode, the actual delete functionality happens here.
+        //void rbDelete(MovieNode * z); //delete a node. Call this from deleteMovieNode, the actual delete functionality happens here.
         void rightRotate(MovieNode * x); //rotate the tree right with x as the root of the rotation
         void rbDeleteFixup(MovieNode * node); //called after delete to fix the tree
         void rbTransplant(MovieNode * u, MovieNode * v); //replace node u in tree with node v. Your solution doesn't necessarily need to use this method
-        int rbValid(MovieNode * node); //check if the tree is valid, with node as the root of the tree
-        int countMovieNodes(MovieNode *node); //number of unique titles in the tree
-        int countLongestPath(MovieNode *node); //longest path from node to a leaf node in the tree
+        int rbValid(MovieNode * node); //check if the tree is valid, with node as the root of the trees
+        int rcountLongPath(MovieNode *temp); //longest path from node to a leaf node in the tree
 
         MovieNode* root;
         MovieNode* leaf;
