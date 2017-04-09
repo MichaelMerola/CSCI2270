@@ -1,36 +1,47 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
 // ----------------------------------------------------------------------
 class customVector{
-  public:
-    //TODO: add appropriate header information
+public:
+    vector <int> intVec;
+    void printVector();
+    void reverseVector();
+    void removeAll();
+    void removeElement(int n);
 
 };
 // ----------------------------------------------------------------------
 void customVector::printVector(){
-  cout << "Elements of Integer Vector: " << endl;
-  // TODO: check if the vector is empty otherwise print all elements in the vector
+    cout << "Elements of Integer Vector: " << endl;
 
+    for (int i = 0; i < intVec.size(); i++) {
+        cout << intVec[i] << endl;
+    }
 }
 
 void customVector::reverseVector(){
-  //TODO: reverse the elements in the vector, using the STL algorithm
-
+    reverse(intVec.begin(), intVec.end());
 }
 
 void customVector::removeAll(){
   cout << "Removing all elements from the vector: " << endl;
-  //TODO: remove all elements from the vector
-
+  intVec.clear();
 }
 
-void customVector::removeElement(int n){
-  //TODO: remove a specific element from the vector
+void customVector::removeElement(int n) {
+    int index;
 
+    for (int i = 0; i < intVec.size(); i++) {
+        if (intVec[i] == n) {
+            index = i;
+        }
+    }
+    intVec.erase(intVec.begin() + index);
 }
 
 // ----------------------------------------------------------------------
