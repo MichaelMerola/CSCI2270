@@ -49,6 +49,7 @@ class Graph
         vertex<T> * findVertex(T name);
 
         void readDataFile(char* filename);
+        void printGraph();
 
     protected:
     private:

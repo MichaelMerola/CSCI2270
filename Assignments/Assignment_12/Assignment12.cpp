@@ -33,6 +33,8 @@ int main(int argc, char* argv[]) {
     //relevant variables
     bool quit = false;
     string userInput;
+    string startingCity;
+    string endingCity;
 
     //change string input to integers for COG
     map <string, int> input;
@@ -46,13 +48,19 @@ int main(int argc, char* argv[]) {
 
         switch(input[userInput]) {
             case 1:
-
+                    gt.printGraph();
                 break;
             case 2:
-
+                    gt.assignDistricts();
                 break;
             case 3:
+                    cout << "Enter a starting city:" << endl;
+                    getline(cin, startingCity);
 
+                    cout << "Enter an ending city:" << endl;
+                    getline(cin, endingCity);
+
+                    gt.shortestPath(startingCity, endingCity);
                 break;
             case 4:
                 quit = true;
