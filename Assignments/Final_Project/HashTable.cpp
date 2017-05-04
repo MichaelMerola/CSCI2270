@@ -50,6 +50,9 @@ void HashTable::queryHashTable(string firstName, string lastName, int birthYear)
 
     bool found = false;
 
+    int chainSearchOps = 0;
+    int openSearchOps = 0;
+
     player* query = new player;
     query->firstName = firstName;
     query->lastName = lastName;
@@ -61,7 +64,6 @@ void HashTable::queryHashTable(string firstName, string lastName, int birthYear)
 
     if (playerDataChain[hashKey] != NULL) {
         while (temp->next != NULL) {
-
             if (temp->firstName == firstName && temp->lastName == lastName && temp->yearBorn == birthYear) {
                 cout << "==== PLAYER DATA ====" << endl;
                 cout << "First Name: " << firstName << endl;
@@ -86,8 +88,42 @@ void HashTable::queryHashTable(string firstName, string lastName, int birthYear)
             }
 
             temp = temp->next;
+            chainSearchOps++;
         }
     }//end if
+
+    // open addressing
+    bool foundViaOpen = false;
+
+    for (int i = hashKey; i < tableSize and !foundViaOpen; i++) {
+        openSearchOps++;
+        if (playerDataOpen[i] -> firstName != firstName or
+            playerDataOpen[i] -> lastName != lastName or
+            playerDataOpen[i] -> yearBorn != birthYear
+        ) {
+            hashKey++;
+        } else {
+            foundViaOpen = true;
+        }
+    }
+
+    if (!foundViaOpen) {
+        for (int j = 0; j < hashKey and !foundViaOpen; j++) {
+            openSearchOps++;
+            if (playerDataOpen[j] -> firstName != firstName or
+                playerDataOpen[j] -> lastName != lastName or
+                playerDataOpen[j] -> yearBorn != birthYear
+            ) {
+                hashKey++;
+            } else {
+                foundViaOpen = true;
+            }
+        }  
+    }
+
+    cout << "Search operations through chaining: " << chainSearchOps << endl;
+    cout << "Search operations through open addressing: " << openSearchOps << endl;
+
     if (found == false) {
         cout << "Could not find player" << endl;
     }
@@ -394,7 +430,7 @@ void HashTable::readDataFileOpen(char* filename) {
             row++; //move to next row
         }//end while
     }//end else
-    
+
     cout << "Collisions using open addressing: " << openColls << endl;
     cout << "Search operations using open addressing: " << openSearchOps << endl;
 
