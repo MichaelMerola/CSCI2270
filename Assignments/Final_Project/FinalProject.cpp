@@ -28,6 +28,7 @@ int main(int argc, char* argv[]) {
     //read all data from txt file
     HashTable ht(stoi(tableSize));
     ht.readDataFileChain(filename);
+    ht.readDataFileOpen(filename);
 
     //relevant variables
     bool quit = false;

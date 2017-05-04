@@ -59,7 +59,7 @@ void HashTable::queryHashTable(string firstName, string lastName, int birthYear)
 
     player* temp = playerDataChain[hashKey];
 
-    if (playerDataChain[hashKey] == NULL) {
+    if (playerDataChain[hashKey] != NULL) {
         while (temp->next != NULL) {
 
             if (temp->firstName == firstName && temp->lastName == lastName && temp->yearBorn == birthYear) {
@@ -75,7 +75,7 @@ void HashTable::queryHashTable(string firstName, string lastName, int birthYear)
                 cout << endl;
 
                 cout << "==== CAREER ====" << endl;
-                for (size_t i = 0; i != (sizeof temp->career); i++) {
+                for (size_t i = 0; i != (temp->career.size()); i++) {
                     cout << temp->career[i]->year << ", ";
                     cout << temp->career[i]->team << ", ";
                     cout << temp->career[i]->league << ", ";
@@ -112,7 +112,6 @@ void HashTable::readDataFileChain(char* filename) {
         string c; //holds each element of line
         int hashKey;
 
-        player* newPlayer = new player;
         int year;
         string team;
         string league;
@@ -125,6 +124,7 @@ void HashTable::readDataFileChain(char* filename) {
 
             stringstream ss(line);
             index = 0;
+            player* newPlayer = new player;
 
             while (getline(ss, c, ',')) { //check through each element (c) in the line
                 if (row != 0) {
@@ -211,6 +211,7 @@ void HashTable::readDataFileChain(char* filename) {
 
                     if (temp->playerID == newPlayer->playerID && temp->yearBorn == newPlayer->yearBorn) {
                         //check if the player already exists at this hashKey
+                        //cout << "already exists" << endl;
                         found = true;
                     }
                     else {
@@ -224,7 +225,7 @@ void HashTable::readDataFileChain(char* filename) {
                         }//end while
                     }
 
-                    cout << found << endl;
+                    //cout << found << endl;
 
                     if (found == true) { //clone player
 
@@ -252,3 +253,150 @@ void HashTable::readDataFileChain(char* filename) {
 
 
 }//end readDataFile for Chaining
+
+void HashTable::readDataFileOpen(char* filename) {
+
+    //counters
+    int openColls = 0;
+    int openSearchOps = 0;
+
+    ifstream playerData;
+    playerData.open(filename, ifstream::in); //open the file
+
+    if (playerData.fail()) {
+        cout << "Could not open file" << endl; // check if file opens successfully
+    }
+    else {
+        //relevant variables
+        string line; //holds string of line
+        string c; //holds each element of line
+        int hashKey;
+
+        int year;
+        string team;
+        string league;
+        int salary;
+
+        int row = 0; //line counter
+        int index; //word counter
+
+        while (getline(playerData, line)) { //run through all lines of data
+
+            stringstream ss(line);
+            index = 0;
+            player* newPlayer = new player;
+
+            while (getline(ss, c, ',')) { //check through each element (c) in the line
+                if (row != 0) {
+
+                    switch (index) {
+
+                        case 0: //year
+                            year = stoi(c);
+                            break;
+
+                        case 1: //teamID
+                            team = c;
+                            break;
+
+                        case 2: //leagueID
+                            league = c;
+                            break;
+
+                        case 3: //playerID
+                            newPlayer->playerID = c;
+                            break;
+
+                        case 4: //salary
+                            salary = stoi(c);
+                            break;
+
+                        case 5: //firstName
+                            newPlayer->firstName = c;
+                            break;
+
+                        case 6: //lastName
+                            newPlayer->lastName = c;
+                            break;
+
+                        case 7: //birthYear
+                            newPlayer->yearBorn = stoi(c);
+                            break;
+
+                        case 8: //birthCountry
+                            newPlayer->countryBorn = c;
+                            break;
+
+                        case 9: //weight
+                            newPlayer->weight = stoi(c);
+                            break;
+
+                        case 10: //height
+                            newPlayer->height = stoi(c);
+                            break;
+
+                        case 11: //bats
+                            newPlayer->bats = c;
+                            break;
+
+                        case 12: //throws
+                            newPlayer->throws = c;
+                            break;
+
+                        default:
+                            break;
+
+                    }//end switch
+
+                }//end row check
+                index++;
+            }//end while inner
+
+            if (row != 0) {
+
+                hashKey = hashFunction(newPlayer); //?? possible pointer error
+
+                if (playerDataOpen[hashKey] == NULL) {
+
+                    playerDataOpen[hashKey] = newPlayer;
+
+                    playerDataOpen[hashKey]->career[0] = new careerData(year, team, league, salary);
+                    playerDataOpen[hashKey]->carIndex += 1;
+                }
+                else { //OPEN IMPLEMENTATION
+                    openColls++;
+                    bool openSpotFound = false;
+
+                    for (int k = hashKey + 1; k < tableSize and !openSpotFound; k++) {
+                        if (playerDataOpen[k] == NULL) {
+                            playerDataOpen[k] = newPlayer;
+                            playerDataOpen[k]->career[0] = new careerData(year, team, league, salary);
+                            playerDataOpen[k]->carIndex += 1;
+                            openSpotFound = true;
+                        }
+                        openSearchOps++;
+                    }
+
+                    if (!openSpotFound) {
+                        for (int j = 0; j < hashKey and !openSpotFound; j++) {
+                            if (playerDataOpen[j] == NULL) {
+                                playerDataOpen[j] = newPlayer;
+                                playerDataOpen[j]->career[0] = new careerData(year, team, league, salary);
+                                playerDataOpen[j]->carIndex += 1;
+                                openSpotFound = true;
+                            }
+                            openSearchOps++;
+                        }
+                    }
+                }//end OPEN IMPLEMENTATION
+            }//end row check
+
+            row++; //move to next row
+        }//end while
+    }//end else
+    
+    cout << "Collisions using open addressing: " << openColls << endl;
+    cout << "Search operations using open addressing: " << openSearchOps << endl;
+
+
+}
