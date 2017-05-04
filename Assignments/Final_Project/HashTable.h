@@ -11,14 +11,25 @@ struct careerData {
     string team;
     string league;
     int salary;
-    bool empty = false;
-}
+    bool full;
+
+    careerData() {}
+
+    careerData(int y, string t, string l, int s) {
+        year = y;
+        team = t;
+        league = l;
+        salary = s;
+
+        full = false;
+    }
+};
 
 struct player {
 
     string firstName;
     string lastName;
-    int playerID;
+    string playerID;
     int yearBorn;
     string countryBorn;
     int weight;
@@ -26,11 +37,19 @@ struct player {
     string bats;
     string throws;
 
-    careerData career[100];
+    vector <careerData*> career;
+    int carIndex;
+    player* next; //chaining implementation
+
+    player() {
+        next = NULL;
+        carIndex = 0;
+        career.resize(1);
+    }
 };
 
-class HashTable
-{
+class HashTable {
+
     public:
         HashTable(int size);
         HashTable();
@@ -39,14 +58,16 @@ class HashTable
         void readDataFileChain(char* filename);
         void readDataFileOpen(char* filename);
 
+        void queryHashTable(string firstName, string lastName, int birthYear);
+
 
     protected:
     private:
         int tableSize;
-        vector<player> playerDataChain;
-        vector<player> playerDataOpen;
+        vector<player*> playerDataChain;
+        vector<player*> playerDataOpen;
 
-        int hashFunction(player p);
+        int hashFunction(player* p);
 
 };
 

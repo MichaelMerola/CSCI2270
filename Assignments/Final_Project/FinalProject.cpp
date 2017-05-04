@@ -22,14 +22,18 @@ string printMenu() {
 int main(int argc, char* argv[]) {
 
     //instantiate class object
-    //TODO: Graph<string> gt;
     char* filename = argv[1];
+    string tableSize = argv[2];
 
     //read all data from txt file
-    //TODO:gt.readDataFile(filename);
+    HashTable ht(stoi(tableSize));
+    ht.readDataFileChain(filename);
 
     //relevant variables
     bool quit = false;
+    string firstName;
+    string lastName;
+    string birthYear;
 
     //change string input to integers for COG
     map <string, int> input;
@@ -37,11 +41,18 @@ int main(int argc, char* argv[]) {
     input ["2"] = 2;
 
     while(quit != true) { //reprints the menu until the user chooses to quit
-        userInput = printMenu(); //prints menu and recieves user input
+        string userInput = printMenu(); //prints menu and recieves user input
 
         switch(input[userInput]) {
             case 1:
+                cout << "Enter first name: ";
+                getline(cin, firstName);
+                cout << "Enter last name: ";
+                getline(cin, lastName);
+                cout << "Enter birth year: ";
+                getline(cin, birthYear);
 
+                ht.queryHashTable(firstName, lastName, stoi(birthYear));
                 break;
             case 2:
                 quit = true;

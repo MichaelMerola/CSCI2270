@@ -5,12 +5,15 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <cmath>
 
 using namespace std;
 
 HashTable::HashTable(int size) {
 
     tableSize = size;
+    playerDataChain.resize(tableSize);
+    playerDataOpen.resize(tableSize);
 
 }//end constructor
 
@@ -20,31 +23,82 @@ HashTable::~HashTable() {}
 ////functions
 //
 
-int HashTable::hashFunction (player p) {
+int HashTable::hashFunction (player* p) {
 
     int firstSum = 1;
     int lastSum = 1;
-    int dataSum = 1;
+    int year = p->yearBorn;
 
     int total = 0;
     int index;
 
-    for (char& c : p.firstName) { //multiply all of the ASCII values of first name
+    for (char& c : p->firstName) { //multiply all of the ASCII values of first name
         firstSum = firstSum*c;
     }
-    for (char& c : p.lastName) { //multiply all of the ASCII values of last name
+    for (char& c : p->lastName) { //multiply all of the ASCII values of last name
         lastSum = lastSum*c;
     }
 
-    dataSum = p.yearBorn * (p.weight + p.height);
-    total = firstSum + lastSum + dataSum;
+    total = firstSum + lastSum + year;
 
     index = total % tableSize;
-    return index;
+    return abs(index);
 
 }//end hashFunction
 
+void HashTable::queryHashTable(string firstName, string lastName, int birthYear) {
+
+    bool found = false;
+
+    player* query = new player;
+    query->firstName = firstName;
+    query->lastName = lastName;
+    query->yearBorn = birthYear;
+
+    int hashKey = hashFunction(query);
+
+    player* temp = playerDataChain[hashKey];
+
+    if (playerDataChain[hashKey] == NULL) {
+        while (temp->next != NULL) {
+
+            if (temp->firstName == firstName && temp->lastName == lastName && temp->yearBorn == birthYear) {
+                cout << "==== PLAYER DATA ====" << endl;
+                cout << "First Name: " << firstName << endl;
+                cout << "Last Name: " << lastName << endl;
+                cout << "Birth Year: " << birthYear << endl;
+                cout << "Birth Country: " << temp->countryBorn << endl;
+                cout << "Weight: " << temp->weight << endl;
+                cout << "Height: " << temp->height << endl;
+                cout << "Bats: " << temp->bats << endl;
+                cout << "Throws: " << temp->throws << endl;
+                cout << endl;
+
+                cout << "==== CAREER ====" << endl;
+                for (size_t i = 0; i != (sizeof temp->career); i++) {
+                    cout << temp->career[i]->year << ", ";
+                    cout << temp->career[i]->team << ", ";
+                    cout << temp->career[i]->league << ", ";
+                    cout << temp->career[i]->salary << endl;
+                }
+
+                found = true;
+            }
+
+            temp = temp->next;
+        }
+    }//end if
+    if (found == false) {
+        cout << "Could not find player" << endl;
+    }
+}//end queryHashTable
+
+
 void HashTable::readDataFileChain(char* filename) {
+
+    //counters
+    int chainColls = 0;
+    int chainSearchOps = 0;
 
     ifstream playerData;
     playerData.open(filename, ifstream::in); //open the file
@@ -56,8 +110,13 @@ void HashTable::readDataFileChain(char* filename) {
         //relevant variables
         string line; //holds string of line
         string c; //holds each element of line
+        int hashKey;
 
-        player newPlayer;
+        player* newPlayer = new player;
+        int year;
+        string team;
+        string league;
+        int salary;
 
         int row = 0; //line counter
         int index; //word counter
@@ -70,60 +129,58 @@ void HashTable::readDataFileChain(char* filename) {
             while (getline(ss, c, ',')) { //check through each element (c) in the line
                 if (row != 0) {
 
-
-
                     switch (index) {
 
                         case 0: //year
-                            //TODO: career data
+                            year = stoi(c);
                             break;
 
                         case 1: //teamID
-                            //TODO: career data
+                            team = c;
                             break;
 
                         case 2: //leagueID
-                            //TODO: career data
+                            league = c;
                             break;
 
                         case 3: //playerID
-                            newPlayer.playerID = stoi(c);
+                            newPlayer->playerID = c;
                             break;
 
                         case 4: //salary
-                            //TODO: career data
+                            salary = stoi(c);
                             break;
 
                         case 5: //firstName
-                            newPlayer.firstName = c;
+                            newPlayer->firstName = c;
                             break;
 
                         case 6: //lastName
-                            newPlayer.lastName = c;
+                            newPlayer->lastName = c;
                             break;
 
                         case 7: //birthYear
-                            newPlayer.birthYear = stoi(c);
+                            newPlayer->yearBorn = stoi(c);
                             break;
 
                         case 8: //birthCountry
-                            newPlayer.birthCountry = c;
+                            newPlayer->countryBorn = c;
                             break;
 
                         case 9: //weight
-                            newPlayer.weight = stoi(c);
+                            newPlayer->weight = stoi(c);
                             break;
 
                         case 10: //height
-                            newPlayer.height = stoi(c);
+                            newPlayer->height = stoi(c);
                             break;
 
                         case 11: //bats
-                            newPlayer.bats = c;
+                            newPlayer->bats = c;
                             break;
 
                         case 12: //throws
-                            newPlayer.throws = c;
+                            newPlayer->throws = c;
                             break;
 
                         default:
@@ -131,13 +188,67 @@ void HashTable::readDataFileChain(char* filename) {
 
                     }//end switch
 
-
-
                 }//end row check
+                index++;
             }//end while inner
+
+            if (row != 0) {
+
+                hashKey = hashFunction(newPlayer); //?? possible pointer error
+
+                if (playerDataChain[hashKey] == NULL) {
+
+                    playerDataChain[hashKey] = newPlayer;
+
+                    playerDataChain[hashKey]->career[0] = new careerData(year, team, league, salary);
+                    playerDataChain[hashKey]->carIndex += 1;
+                }
+                else { //CHAINING IMPLEMENTATION
+                    chainColls++;
+
+                    bool found = false;
+                    player* temp = playerDataChain[hashKey];
+
+                    if (temp->playerID == newPlayer->playerID && temp->yearBorn == newPlayer->yearBorn) {
+                        //check if the player already exists at this hashKey
+                        found = true;
+                    }
+                    else {
+                        while (temp->next != NULL) {
+                            if (temp->playerID == newPlayer->playerID && temp->yearBorn == newPlayer->yearBorn) {
+                                found = true;
+                                break;
+                            }
+                            temp = temp->next;
+                            chainSearchOps++;
+                        }//end while
+                    }
+
+                    cout << found << endl;
+
+                    if (found == true) { //clone player
+
+                        temp->career[newPlayer->carIndex] = new careerData(year, team, league, salary);
+                        temp->carIndex += 1;
+                    }
+                    else { //unique player
+                        temp->next = newPlayer;
+
+                        newPlayer->career[newPlayer->carIndex] = new careerData(year, team, league, salary);
+                        newPlayer->carIndex += 1;
+                    }
+
+
+                }//end CHAINING IMPLEMENTATION
+            }//end row check
 
             row++; //move to next row
         }//end while
     }//end else
+
+    cout << "Hash Table Size: " << tableSize << endl;
+    cout << "Collisions using chaining: " << chainColls << endl;
+    cout << "Search operations using chaining: " << chainSearchOps << endl;
+
 
 }//end readDataFile for Chaining
